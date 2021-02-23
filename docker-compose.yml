@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  application:
+    container_name: nest-cms-application
+    build:
+      context: .
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 3000:3000
+      - 9229:9229
+    command: npm run start:dev
+    env_file:
+      - .env
+    networks:
+      - nest-cms-network
+    depends_on:
+      - mysql
+  mysql:
+    container_name: nest-cms-mysql
+    image: mysql:5.7
+    command: --sql_mode=""
+    networks:
+      - nest-cms-network
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nest-cms
+    volumes:
+      - ./.docker/data/mysql/:/var/lib/mysql
+      - ./.docker/logs/mysql/:/var/log/mysql
+    ports:
+      - 3306:3306
+networks:
+  nest-cms-network:
