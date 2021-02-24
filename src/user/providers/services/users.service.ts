@@ -12,8 +12,15 @@ export class UsersService {
     return await this.userDAO.findAll();
   }
 
-  public async getOne(conditions: object): Promise<UserInterface> {
-    return await this.userDAO.findOne(conditions);
+  public async getOne(conditions: object, raw = false): Promise<UserInterface> {
+    const user = await this.userDAO.findOne(conditions, raw);
+
+    if (user && raw) {
+      const { password, token, ...userData } = user;
+      return userData;
+    }
+
+    return user;
   }
 
   public async create(partial: Partial<User>): Promise<UserInterface> {
@@ -28,7 +35,7 @@ export class UsersService {
     user: UserInterface,
     partial: Partial<UserInterface>,
   ): Promise<UserInterface> {
-    const userByEmail = await this.userDAO.findOne({ email: partial.email });
+    const userByEmail = partial.email ? await this.userDAO.findOne({ email: partial.email }) : null;
 
     if (userByEmail && userByEmail.id !== user.id) {
       throw UserException.credentialsAlreadyInUse();

@@ -19,11 +19,12 @@ export class UserDAO {
   }
 
   public async findAll(): Promise<UserInterface[]> {
-    return await this.userModel.findAll();
+    return await this.userModel.findAll({ raw: true });
   }
 
-  public async findOne(condition: object): Promise<UserInterface> {
+  public async findOne(condition: object, raw = false): Promise<UserInterface> {
     return await this.userModel.findOne({
+      raw,
       where: condition,
     });
   }

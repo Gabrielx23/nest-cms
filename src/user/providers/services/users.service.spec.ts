@@ -12,7 +12,7 @@ const userDAOMock = () => ({
   destroy: jest.fn(),
 });
 
-const user: UserInterface = { email: '', name: '', password: '' };
+const user: UserInterface = { email: '', name: '', password: 'password', token: 'token' };
 
 describe('UsersService', () => {
   let service: UsersService, dao: UserDAO;
@@ -32,8 +32,19 @@ describe('UsersService', () => {
 
       const result = await service.getOne({ id: 'id' });
 
-      expect(dao.findOne).toBeCalledWith({ id: 'id' });
+      expect(dao.findOne).toBeCalledWith({ id: 'id' }, false);
       expect(result).toEqual(user);
+    });
+
+    it('returns user without password and token if raw flag is true', async () => {
+      jest.spyOn(dao, 'findOne').mockResolvedValue(user);
+
+      const result = await service.getOne({ id: 'id' }, true);
+
+      const { password, token, ...userData } = user;
+
+      expect(dao.findOne).toBeCalledWith({ id: 'id' }, true);
+      expect(result).toEqual(userData);
     });
   });
 

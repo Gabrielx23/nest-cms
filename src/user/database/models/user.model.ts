@@ -16,7 +16,7 @@ export class User extends Model<User> implements UserInterface {
   @Column
   public email: string;
 
-  @ApiProperty({ example: 'Demo2020' })
+  @ApiProperty({ example: 'password' })
   @Exclude({ toPlainOnly: true })
   @Column
   public password: string;
