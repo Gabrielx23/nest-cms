@@ -54,9 +54,13 @@ export class AuthService {
       expiresIn: expiresIn + expiresInUnit,
     });
 
+    authDTO.tokenExpiresIn = expiresIn + expiresInUnit;
+
     authDTO.refreshToken = jwt.sign({ email: user.email }, refreshSecret, {
       expiresIn: refreshTokenExpiresIn + expiresInUnit,
     });
+
+    authDTO.refreshTokenExpiresIn = refreshTokenExpiresIn + expiresInUnit;
 
     await this.userDAO.update(user as User, { token: authDTO.token });
 
