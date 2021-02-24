@@ -1,6 +1,6 @@
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { LoggedUser } from '../logged-user.decorator';
+import { LoggedUser } from '../decorators/logged-user.decorator';
 import { UsersService } from '../providers/services/users.service';
 import { AuthService } from '../providers/services/auth.service';
 import { PasswordsService } from '../providers/services/passwords.service';

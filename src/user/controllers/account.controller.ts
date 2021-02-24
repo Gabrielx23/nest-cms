@@ -17,7 +17,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { LoggedUser } from '../logged-user.decorator';
+import { LoggedUser } from '../decorators/logged-user.decorator';
 import { UsersService } from '../providers/services/users.service';
 import { PasswordsService } from '../providers/services/passwords.service';
 import { AuthGuard } from '../providers/auth.guard';
