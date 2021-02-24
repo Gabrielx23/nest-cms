@@ -1,4 +1,5 @@
 import { SequelizeModuleOptions } from '@nestjs/sequelize';
+import { User } from '../../user/database/models/user.model';
 
 export const sequelizeModuleOptions: SequelizeModuleOptions = {
   dialect: 'mysql',
@@ -7,5 +8,5 @@ export const sequelizeModuleOptions: SequelizeModuleOptions = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  models: [],
+  models: [User],
 };
