@@ -63,7 +63,7 @@ describe('AuthController', () => {
       expect(passwordsService.hash).toHaveBeenCalledWith(dto.password);
     });
 
-    it('uses create user service to create user with given data', async () => {
+    it('uses users service to create user with given data', async () => {
       jest.spyOn(passwordsService, 'hash').mockResolvedValue('hashed');
 
       const partial = { ...dto, password: 'hashed', role: RoleEnum.user };

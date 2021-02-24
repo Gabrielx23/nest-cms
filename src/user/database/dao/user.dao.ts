@@ -18,8 +18,13 @@ export class UserDAO {
     return await user.save();
   }
 
-  public async findAll(): Promise<UserInterface[]> {
-    return await this.userModel.findAll({ raw: true });
+  public async findAll(raw = false): Promise<UserInterface[]> {
+    return await this.userModel.findAll({
+      raw,
+      attributes: {
+        exclude: ['password', 'token'],
+      },
+    });
   }
 
   public async findOne(condition: object, raw = false): Promise<UserInterface> {

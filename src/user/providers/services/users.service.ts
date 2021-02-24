@@ -8,8 +8,8 @@ import { UserInterface } from '../../database/models/user.interface';
 export class UsersService {
   constructor(private readonly userDAO: UserDAO) {}
 
-  public async getAll(): Promise<Array<UserInterface>> {
-    return await this.userDAO.findAll();
+  public async getAll(raw = false): Promise<Array<UserInterface>> {
+    return await this.userDAO.findAll(raw);
   }
 
   public async getOne(conditions: object, raw = false): Promise<UserInterface> {
