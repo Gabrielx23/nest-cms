@@ -2,6 +2,7 @@ import { Column, Model, Table } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { UserInterface } from './user.interface';
+import { RoleEnum } from '../../enum/role.enum';
 
 @Table
 export class User extends Model<User> implements UserInterface {
@@ -15,6 +16,10 @@ export class User extends Model<User> implements UserInterface {
   @ApiProperty({ example: 'john.doe@gmail.com' })
   @Column
   public email: string;
+
+  @ApiProperty({ example: RoleEnum.user })
+  @Column
+  public role: RoleEnum;
 
   @ApiProperty({ example: 'password' })
   @Exclude({ toPlainOnly: true })

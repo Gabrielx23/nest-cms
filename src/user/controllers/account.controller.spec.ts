@@ -6,6 +6,7 @@ import { UserInterface } from '../database/models/user.interface';
 import { AccountController } from './account.controller';
 import { ChangePasswordDTO } from '../dto/change-password.dto';
 import { UpdateAccountDTO } from '../dto/update-account.dto';
+import { RoleEnum } from '../enum/role.enum';
 
 const usersServiceMock = () => ({
   update: jest.fn(),
@@ -17,7 +18,7 @@ const passwordServiceMock = () => ({
   hash: jest.fn(),
 });
 
-const user: UserInterface = { id: 'id', email: '', name: '', password: '' };
+const user: UserInterface = { id: 'id', role: RoleEnum.user, email: '', name: '', password: '' };
 
 describe('AccountController', () => {
   let passwordsService: PasswordsService, usersService: UsersService, controller: AccountController;

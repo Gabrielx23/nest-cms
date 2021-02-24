@@ -1,6 +1,12 @@
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 
 export class AuthException {
+  public static insufficientPrivileges(): ForbiddenException {
+    return new UnauthorizedException(
+      'Insufficient privileges! You are not allowed to perform this action.',
+    );
+  }
+
   public static incorrectAuthorizationToken(): UnauthorizedException {
     return new UnauthorizedException('Authorization token is incorrect!');
   }

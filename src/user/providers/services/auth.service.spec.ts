@@ -10,6 +10,7 @@ import { User } from '../../database/models/user.model';
 import { EnvKeyEnum } from '../../../app/enum/env-key.enum';
 import { AuthDTO } from '../../dto/auth.dto';
 import { JwtTokenTypeEnum } from '../../enum/jwt-token-type.enum';
+import { RoleEnum } from '../../enum/role.enum';
 
 const userDAOMock = () => ({
   update: jest.fn(),
@@ -20,7 +21,7 @@ const configServiceMock = () => ({
   get: jest.fn(),
 });
 
-const user: UserInterface = { email: '', name: '', password: '' };
+const user: UserInterface = { role: RoleEnum.user, email: '', name: '', password: '' };
 
 describe('AuthService', () => {
   let service: AuthService, dao: UserDAO, config: ConfigService;

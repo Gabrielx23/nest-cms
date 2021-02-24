@@ -11,6 +11,7 @@ import { AuthTokenPayloadDTO } from '../dto/auth-token-payload.dto';
 import { JwtTokenTypeEnum } from '../enum/jwt-token-type.enum';
 import { UserInterface } from '../database/models/user.interface';
 import { RegisterDTO } from '../dto/register.dto';
+import { RoleEnum } from '../enum/role.enum';
 
 const usersServiceMock = () => ({
   getOne: jest.fn(),
@@ -28,7 +29,7 @@ const authServiceMock = () => ({
   logout: jest.fn(),
 });
 
-const user: UserInterface = { email: '', name: '', password: '' };
+const user: UserInterface = { role: RoleEnum.user, email: '', name: '', password: '' };
 
 describe('AuthController', () => {
   let authService: AuthService,
@@ -65,7 +66,7 @@ describe('AuthController', () => {
     it('uses create user service to create user with given data', async () => {
       jest.spyOn(passwordsService, 'hash').mockResolvedValue('hashed');
 
-      const partial = { ...dto, password: 'hashed' };
+      const partial = { ...dto, password: 'hashed', role: RoleEnum.user };
 
       await controller.register(dto);
 

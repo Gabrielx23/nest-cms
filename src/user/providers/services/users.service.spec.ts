@@ -3,6 +3,7 @@ import { UserDAO } from '../../database/dao/user.dao';
 import { UserInterface } from '../../database/models/user.interface';
 import { UsersService } from './users.service';
 import { BadRequestException } from '@nestjs/common';
+import { RoleEnum } from '../../enum/role.enum';
 
 const userDAOMock = () => ({
   findOne: jest.fn(),
@@ -12,7 +13,13 @@ const userDAOMock = () => ({
   destroy: jest.fn(),
 });
 
-const user: UserInterface = { email: '', name: '', password: 'password', token: 'token' };
+const user: UserInterface = {
+  role: RoleEnum.user,
+  email: '',
+  name: '',
+  password: 'password',
+  token: 'token',
+};
 
 describe('UsersService', () => {
   let service: UsersService, dao: UserDAO;
@@ -93,7 +100,13 @@ describe('UsersService', () => {
     const partial = { email: 'email', password: 'password' };
 
     it('throws bad request exception if email is already in use', async () => {
-      const user2: UserInterface = { id: 'id', email: '', name: '', password: '' };
+      const user2: UserInterface = {
+        role: RoleEnum.user,
+        id: 'id',
+        email: '',
+        name: '',
+        password: '',
+      };
 
       jest.spyOn(dao, 'findOne').mockResolvedValue(user2);
 

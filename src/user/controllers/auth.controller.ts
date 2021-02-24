@@ -13,6 +13,7 @@ import { JwtTokenTypeEnum } from '../enum/jwt-token-type.enum';
 import { AuthException } from '../exceptions/auth.exception';
 import { RegisterDTO } from '../dto/register.dto';
 import { UserInterface } from '../database/models/user.interface';
+import { RoleEnum } from '../enum/role.enum';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -39,7 +40,7 @@ export class AuthController {
   public async register(@Body() registerDTO: RegisterDTO): Promise<void> {
     const password = await this.passwordService.hash(registerDTO.password);
 
-    const partial = { ...registerDTO, password };
+    const partial = { ...registerDTO, password, role: RoleEnum.user };
 
     await this.usersService.create(partial);
   }
