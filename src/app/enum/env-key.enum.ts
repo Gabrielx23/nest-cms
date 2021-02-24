@@ -4,6 +4,7 @@ export enum EnvKeyEnum {
   JWTExpiresIn = 'JWT_EXPIRES_IN',
   JWTExpiresInUnit = 'JWT_EXPIRES_IN_UNIT',
   AppUrl = 'APP_URL',
+  MaxPayloadSize = 'MAX_PAYLOAD_SIZE',
   SwaggerTitle = 'SWAGGER_TITLE',
   SwaggerDescription = 'SWAGGER_DESCRIPTION',
   SwaggerVersion = 'SWAGGER_VERSION',
