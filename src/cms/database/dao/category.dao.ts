@@ -27,11 +27,6 @@ export class CategoryDAO {
     return await this.categoryModel.findAndCountAll({
       limit: options.limit,
       offset: (options.page - 1) * options.limit,
-      include: [
-        {
-          association: 'category',
-        },
-      ],
       where: conditions || {},
     });
   }
@@ -43,11 +38,6 @@ export class CategoryDAO {
   public async findOne(condition: object): Promise<CategoryInterface> {
     return await this.categoryModel.findOne({
       where: condition,
-      include: [
-        {
-          association: 'category',
-        },
-      ],
     });
   }
 

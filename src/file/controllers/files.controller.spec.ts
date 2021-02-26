@@ -7,7 +7,7 @@ import { FileInterface } from '../database/models/file.interface';
 import { FilesService } from '../providers/services/files.service';
 import { FilesController } from './files.controller';
 import { FileSystemService } from '../providers/services/file-system.service';
-import { UploadFileDTO } from '../../../dist/file/dto/upload-file.dto';
+import { FileDTO } from '../dto/file.dto';
 
 const filesServiceMock = () => ({
   update: jest.fn(),
@@ -52,7 +52,7 @@ describe('FilesController', () => {
   });
 
   describe('upload', () => {
-    const dto = new UploadFileDTO();
+    const dto = new FileDTO();
 
     const uploadedFile = {
       path: '/path',
@@ -85,7 +85,7 @@ describe('FilesController', () => {
   });
 
   describe('update', () => {
-    const dto = new UploadFileDTO();
+    const dto = new FileDTO();
 
     it('throws exception if file not exist', async () => {
       jest.spyOn(filesService, 'getOne').mockResolvedValue(null);

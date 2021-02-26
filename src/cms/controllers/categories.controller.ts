@@ -7,6 +7,7 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import {
   Body,
@@ -23,7 +24,6 @@ import {
   Put,
 } from '@nestjs/common';
 import { AuthGuard } from '../../user/providers/auth.guard';
-import { PageException } from '../exceptions/page.exception';
 import { PaginationDTO } from '../../app/dto/pagination.dto';
 import { PaginationResponseDTO } from '../../app/dto/pagination-response.dto';
 import { CategoriesService } from '../providers/services/categories.service';
@@ -31,6 +31,7 @@ import { CategoryInterface } from '../database/models/category.interface';
 import { Category } from '../database/models/category.model';
 import { CategoryDTO } from '../dto/category.dto';
 import { CategoryException } from '../exceptions/category.exception';
+import { Op } from 'sequelize';
 
 @ApiTags('Category')
 @Controller('categories')
@@ -76,10 +77,14 @@ export class CategoriesController {
     @Body() categoryDTO: CategoryDTO,
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<CategoryInterface> {
-    const page = await this.categoriesService.getOne({ id });
+    const category = await this.categoriesService.getOne({ id });
 
-    if (!page) {
+    if (!category) {
       throw CategoryException.categoryNotExist();
+    }
+
+    if (categoryDTO.categoryId && categoryDTO.categoryId === category.id) {
+      throw CategoryException.categoryCannotHaveParentWithSameId();
     }
 
     if (
@@ -93,28 +98,61 @@ export class CategoriesController {
       ? await this.categoriesService.getOne({ slug: categoryDTO.slug })
       : null;
 
-    if (categoryBySlug && categoryBySlug.slug !== page.slug) {
+    if (categoryBySlug && categoryBySlug.slug !== category.slug) {
       throw CategoryException.slugAlreadyExist();
     }
 
-    return await this.categoriesService.update(page, categoryDTO);
+    return await this.categoriesService.update(category, categoryDTO);
+  }
+
+  @Get('/children/:id')
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: Category })
+  @ApiNotFoundResponse()
+  @ApiForbiddenResponse()
+  @ApiUnauthorizedResponse()
+  public async getChildren(
+    @Query() paginateDTO: PaginationDTO,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<PaginationResponseDTO> {
+    const category = await this.categoriesService.getOne({ id });
+
+    if (!category) {
+      throw CategoryException.categoryNotExist();
+    }
+
+    return await this.categoriesService.getAll(paginateDTO, { categoryId: category.id });
   }
 
   @Get('/')
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'search', required: false, allowEmptyValue: true })
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOkResponse({ type: PaginationResponseDTO })
   public async getAll(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
     @Query() paginateDTO: PaginationDTO,
+    @Query('search') search?: string,
   ): Promise<PaginationResponseDTO> {
-    return await this.categoriesService.getAll(paginateDTO);
+    const conditions = search ? { name: { [Op.like]: `%${search}%` } } : undefined;
+
+    return await this.categoriesService.getAll(paginateDTO, conditions);
   }
 
   @Get('/:id')
   @ApiOkResponse({ type: Category })
   public async getOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<CategoryInterface> {
-    return await this.categoriesService.getOne({ id });
+    const category = await this.categoriesService.getOne({ id });
+
+    if (!category) {
+      throw CategoryException.categoryNotExist();
+    }
+
+    return category;
   }
 
   @Delete('/:id')

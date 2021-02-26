@@ -113,8 +113,8 @@ export class PagesController {
   @Get('/preview')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiQuery({ name: 'limit' })
-  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'search', required: false, allowEmptyValue: true })
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOkResponse({ type: PaginationResponseDTO })
@@ -173,7 +173,7 @@ export class PagesController {
     return page;
   }
 
-  @Patch('publishedAt/:id')
+  @Patch('published/:id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: Page })

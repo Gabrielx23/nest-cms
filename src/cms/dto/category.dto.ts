@@ -1,15 +1,13 @@
-import { IsOptional, MaxLength, MinLength, Matches, IsUUID, IsString } from 'class-validator';
+import { IsOptional, MaxLength, MinLength, Matches, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CategoryDTO {
-  @IsString()
   @MinLength(3)
   @MaxLength(253)
   @ApiProperty({ example: 'category name' })
   name: string;
 
   @IsOptional()
-  @IsString()
   @Matches('^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$')
   @MaxLength(255)
   @ApiProperty({ example: 'category-name' })

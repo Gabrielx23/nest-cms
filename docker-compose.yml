@@ -21,7 +21,6 @@ services:
   mysql:
     container_name: nest-cms-mysql
     image: mysql:5.7
-    command: --sql_mode=""
     networks:
       - nest-cms-network
     environment:

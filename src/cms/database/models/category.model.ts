@@ -1,7 +1,6 @@
-import { BelongsTo, Column, ForeignKey, HasMany, HasOne, Model, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { CategoryInterface } from './category.interface';
-import { Page } from './page.model';
 
 @Table
 export class Category extends Model<Category> implements CategoryInterface {

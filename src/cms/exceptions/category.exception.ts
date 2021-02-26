@@ -16,4 +16,8 @@ export class CategoryException {
   public static parentCategoryNotExist(): NotFoundException {
     return new NotFoundException('Parent category not exist!');
   }
+
+  public static categoryCannotHaveParentWithSameId(): BadRequestException {
+    return new BadRequestException('Category cannot have parent with the same id!');
+  }
 }
