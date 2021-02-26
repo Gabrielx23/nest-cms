@@ -42,7 +42,7 @@ const pagination: PaginationResponseDTO = {
   rows: [page],
 };
 
-describe('PageController', () => {
+describe('PagesController', () => {
   let pagesService: PagesService, controller: PagesController;
 
   beforeEach(async () => {
@@ -138,13 +138,16 @@ describe('PageController', () => {
 
   describe('previewAll', () => {
     const paginationDTO = new PaginationDTO();
+    const search = 'search';
 
     it('uses pages service to obtain all paginated pages', async () => {
       jest.spyOn(pagesService, 'getAll').mockResolvedValue(pagination);
 
-      await controller.previewAll(paginationDTO);
+      await controller.previewAll(paginationDTO, search);
 
-      expect(pagesService.getAll).toHaveBeenCalledWith(paginationDTO);
+      expect(pagesService.getAll).toHaveBeenCalledWith(paginationDTO, {
+        name: { [Op.like]: `%${search}%` },
+      });
     });
 
     it('returns obtained pages', async () => {

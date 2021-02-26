@@ -27,9 +27,6 @@ export class AuthGuard implements CanActivate {
     const roles = this.reflector.get<string[]>(metaDataKey, context.getHandler());
     const hasPrivileges = roles ? roles.includes(user.role) : true;
 
-    console.log(roles);
-    console.log(user.role);
-
     if (!hasPrivileges) {
       throw AuthException.insufficientPrivileges();
     }

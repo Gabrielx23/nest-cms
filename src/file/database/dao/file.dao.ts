@@ -4,9 +4,11 @@ import { Persister } from '../../../app/utils/persister';
 import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 import { FileInterface } from '../models/file.interface';
 import { File } from '../models/file.model';
+import { PaginationOptionsInterface } from '../../../app/interfaces/pagination-options.interface';
+import { PaginationResponseInterface } from '../../../app/interfaces/pagination-response.interface';
 
 @Injectable()
-export class FileDao {
+export class FileDAO {
   constructor(
     @InjectModel(File)
     private readonly fileModel: typeof File,
@@ -18,10 +20,19 @@ export class FileDao {
     return await file.save();
   }
 
-  public async findAll(raw = false): Promise<FileInterface[]> {
-    return await this.fileModel.findAll({
-      raw,
+  public async findAll(
+    options: PaginationOptionsInterface,
+    conditions?: object,
+  ): Promise<PaginationResponseInterface> {
+    return await this.fileModel.findAndCountAll({
+      limit: options.limit,
+      offset: (options.page - 1) * options.limit,
+      where: conditions || {},
     });
+  }
+
+  public async countAll(): Promise<number> {
+    return await this.fileModel.count();
   }
 
   public async findOne(condition: object, raw = false): Promise<FileInterface> {

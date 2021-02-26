@@ -115,12 +115,18 @@ export class PagesController {
   @ApiBearerAuth()
   @ApiQuery({ name: 'limit' })
   @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'search', required: false, allowEmptyValue: true })
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOkResponse({ type: PaginationResponseDTO })
   @ApiForbiddenResponse()
   @ApiUnauthorizedResponse()
-  public async previewAll(@Query() paginateDTO: PaginationDTO): Promise<PaginationResponseDTO> {
-    return await this.pagesService.getAll(paginateDTO);
+  public async previewAll(
+    @Query() paginateDTO: PaginationDTO,
+    @Query('search') search?: string,
+  ): Promise<PaginationResponseDTO> {
+    const conditions = search ? { name: { [Op.like]: `%${search}%` } } : undefined;
+
+    return await this.pagesService.getAll(paginateDTO, conditions);
   }
 
   @Get('/preview/:id')
@@ -134,12 +140,25 @@ export class PagesController {
   }
 
   @Get('/')
-  @ApiQuery({ name: 'limit' })
-  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'search', required: false, allowEmptyValue: true })
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOkResponse({ type: PaginationResponseDTO })
-  public async getAll(@Query() paginateDTO: PaginationDTO): Promise<PaginationResponseDTO> {
-    return await this.pagesService.getAll(paginateDTO, { publishedAt: { [Op.not]: null } });
+  public async getAll(
+    @Query() paginateDTO: PaginationDTO,
+    @Query('search') search?: string,
+  ): Promise<PaginationResponseDTO> {
+    const conditions = {
+      publishedAt: { [Op.not]: null },
+      name: { [Op.like]: `%${search}%` },
+    };
+
+    if (!search) {
+      delete conditions.name;
+    }
+
+    return await this.pagesService.getAll(paginateDTO, conditions);
   }
 
   @Get('/:id')
