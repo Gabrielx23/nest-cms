@@ -1,8 +1,9 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, HasMany, Model, Table } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { UserInterface } from './user.interface';
 import { RoleEnum } from '../../enum/role.enum';
+import { Page } from '../../../cms/database/models/page.model';
 
 @Table
 export class User extends Model<User> implements UserInterface {
@@ -37,4 +38,7 @@ export class User extends Model<User> implements UserInterface {
   @ApiProperty({ example: '2020-08-10T05:59:36.708Z' })
   @Column
   public updatedAt: Date;
+
+  @HasMany(() => Page)
+  public pages: Page[];
 }

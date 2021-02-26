@@ -9,4 +9,5 @@ export enum EnvKeyEnum {
   SwaggerDescription = 'SWAGGER_DESCRIPTION',
   SwaggerVersion = 'SWAGGER_VERSION',
   SwaggerUri = 'SWAGGER_URI',
+  MaxSlugGenerateAttempts = 'MAX_SLUG_GENERATE_ATTEMPTS',
 }
