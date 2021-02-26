@@ -6,11 +6,13 @@ import { PageDAO } from './database/dao/page.dao';
 import { controllers } from './controllers';
 import { UserModule } from '../user/user.module';
 import { Slugger } from '../app/utils/slugger';
+import { CategoryDAO } from './database/dao/category.dao';
+import { Category } from './database/models/category.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Page]), UserModule],
+  imports: [SequelizeModule.forFeature([Page, Category]), UserModule],
   controllers: [...controllers],
-  providers: [...providers, PageDAO, Slugger],
+  providers: [...providers, PageDAO, CategoryDAO, Slugger],
   exports: [SequelizeModule],
 })
 export class CMSModule {}

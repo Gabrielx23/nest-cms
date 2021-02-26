@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { PageInterface } from '../database/models/page.interface';
 import { PagesService } from '../providers/services/pages.service';
-import { PageController } from './page.controller';
+import { PagesController } from './pages.controller';
 import { PageDTO } from '../dto/page.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { UserInterface } from '../../user/database/models/user.interface';
@@ -43,7 +43,7 @@ const pagination: PaginationResponseDTO = {
 };
 
 describe('PageController', () => {
-  let pagesService: PagesService, controller: PageController;
+  let pagesService: PagesService, controller: PagesController;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -51,7 +51,7 @@ describe('PageController', () => {
     }).compile();
 
     pagesService = await module.get(PagesService);
-    controller = new PageController(pagesService);
+    controller = new PagesController(pagesService);
   });
 
   describe('create', () => {
@@ -197,7 +197,7 @@ describe('PageController', () => {
   });
 
   describe('getOne', () => {
-    it('throws exception if service not exist or is not published', async () => {
+    it('throws exception if page not exist or is not published', async () => {
       await expect(controller.getOne(page.id)).rejects.toThrow(NotFoundException);
     });
 

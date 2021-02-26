@@ -5,6 +5,7 @@ import { PageInterface } from '../../database/models/page.interface';
 import { Slugger } from '../../../app/utils/slugger';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
+import { Paginator } from '../../../app/utils/paginator';
 
 const pageDAOMock = () => ({
   findOne: jest.fn(),
@@ -133,7 +134,9 @@ describe('PagesService', () => {
 
       const result = await service.getAll(options);
 
-      expect(result).toEqual({ count: 1, rows: [page], totalCount: 5, page: 1, limit: 10 });
+      expect(result).toEqual(
+        Paginator.paginate({ page: 1, limit: 10 }, { count: 1, totalCount: 5, rows: [page] }),
+      );
     });
   });
 

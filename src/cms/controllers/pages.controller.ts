@@ -7,7 +7,6 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
-  ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
 import {
@@ -38,8 +37,8 @@ import { Op } from 'sequelize';
 import { PaginationResponseDTO } from '../../app/dto/pagination-response.dto';
 
 @ApiTags('Page')
-@Controller('page')
-export class PageController {
+@Controller('pages')
+export class PagesController {
   constructor(private readonly pagesService: PagesService) {}
 
   @Post('/')
@@ -114,15 +113,13 @@ export class PageController {
   @Get('/preview')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
+  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'page' })
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOkResponse({ type: PaginationResponseDTO })
   @ApiForbiddenResponse()
   @ApiUnauthorizedResponse()
-  public async previewAll(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-    @Query() paginateDTO: PaginationDTO,
-  ): Promise<PaginationResponseDTO> {
+  public async previewAll(@Query() paginateDTO: PaginationDTO): Promise<PaginationResponseDTO> {
     return await this.pagesService.getAll(paginateDTO);
   }
 
@@ -137,13 +134,11 @@ export class PageController {
   }
 
   @Get('/')
+  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'page' })
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOkResponse({ type: PaginationResponseDTO })
-  public async getAll(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-    @Query() paginateDTO: PaginationDTO,
-  ): Promise<PaginationResponseDTO> {
+  public async getAll(@Query() paginateDTO: PaginationDTO): Promise<PaginationResponseDTO> {
     return await this.pagesService.getAll(paginateDTO, { publishedAt: { [Op.not]: null } });
   }
 
