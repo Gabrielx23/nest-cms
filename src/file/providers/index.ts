@@ -1,1 +1,3 @@
-export const providers = [];
+import { services } from './services';
+
+export const providers = [...services];
