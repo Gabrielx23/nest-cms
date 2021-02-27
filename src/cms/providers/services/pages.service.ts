@@ -9,6 +9,7 @@ import { Paginator } from '../../../app/utils/paginator';
 import { PaginationResponseDTO } from '../../../app/dto/pagination-response.dto';
 import { ConfigService } from '@nestjs/config';
 import { EnvKeyEnum } from '../../../app/enum/env-key.enum';
+import { PageCategoryDAO } from '../../database/dao/page-category.dao';
 
 @Injectable()
 export class PagesService {
@@ -16,6 +17,7 @@ export class PagesService {
     private readonly pageDAO: PageDAO,
     private readonly slugger: Slugger,
     private readonly configService: ConfigService,
+    private readonly pageCategoryDAO: PageCategoryDAO,
   ) {}
 
   public async getAll(
@@ -48,12 +50,34 @@ export class PagesService {
     throw PageException.tooManyGenerateSlugAttempts();
   }
 
-  public async create(partial: Partial<Page>): Promise<PageInterface> {
-    return await this.pageDAO.create(partial);
+  public async create(partial: Partial<Page>, categories?: Array<string>): Promise<PageInterface> {
+    const created = await this.pageDAO.create(partial);
+
+    if (categories) {
+      for (const categoryId of categories) {
+        await this.pageCategoryDAO.create({ pageId: created.id, categoryId });
+      }
+    }
+
+    return await this.pageDAO.findOne({ id: created.id });
   }
 
-  public async update(page: PageInterface, partial: Partial<Page>): Promise<PageInterface> {
-    return await this.pageDAO.update(page as Page, partial);
+  public async update(
+    page: PageInterface,
+    partial: Partial<Page>,
+    categories?: Array<string>,
+  ): Promise<PageInterface> {
+    const updated = await this.pageDAO.update(page as Page, partial);
+
+    if (categories) {
+      await this.pageCategoryDAO.destroy(page.id);
+
+      for (const categoryId of categories) {
+        await this.pageCategoryDAO.create({ pageId: updated.id, categoryId });
+      }
+    }
+
+    return await this.pageDAO.findOne({ id: updated.id });
   }
 
   public async destroy(page: PageInterface): Promise<void> {

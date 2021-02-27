@@ -1,8 +1,10 @@
-import { BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { BelongsTo, BelongsToMany, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { PageInterface } from './page.interface';
 import { PageTemplateTypeEnum } from '../../enum/page-template-type.enum';
 import { User } from '../../../user/database/models/user.model';
+import { PageCategory } from './page-category.model';
+import { Category } from './category.model';
 
 @Table
 export class Page extends Model<Page> implements PageInterface {
@@ -52,6 +54,9 @@ export class Page extends Model<Page> implements PageInterface {
   @ApiProperty({ example: 'Meta description' })
   @Column
   public metaDescription!: string;
+
+  @BelongsToMany(() => Category, () => PageCategory)
+  public categories: Category[];
 
   @ApiProperty({ example: '2020-08-10T05:59:36.708Z' })
   @Column

@@ -57,6 +57,7 @@ describe('PagesController', () => {
   describe('create', () => {
     const dto = new PageDTO();
     dto.slug = 'slug';
+    dto.categories = ['id'];
 
     it('throws exception if slug already exist', async () => {
       jest.spyOn(pagesService, 'getOne').mockResolvedValue(page);
@@ -67,7 +68,12 @@ describe('PagesController', () => {
     it('uses pages service to create new page', async () => {
       await controller.create(dto, user);
 
-      expect(pagesService.create).toHaveBeenCalledWith({ ...dto, userId: user.id });
+      const { categories, ...createdPage } = dto;
+
+      expect(pagesService.create).toHaveBeenCalledWith(
+        { ...createdPage, userId: user.id },
+        categories,
+      );
     });
 
     it('returns created page', async () => {
@@ -81,6 +87,7 @@ describe('PagesController', () => {
 
   describe('update', () => {
     const dto = new PageDTO();
+    dto.categories = ['id'];
 
     it('throws exception if page is not found', async () => {
       await expect(controller.update(dto, page.id)).rejects.toThrow(NotFoundException);
@@ -101,7 +108,9 @@ describe('PagesController', () => {
 
       await controller.update(dto, page.id);
 
-      expect(pagesService.update).toHaveBeenCalledWith(page, dto);
+      const { categories, ...updatedPage } = dto;
+
+      expect(pagesService.update).toHaveBeenCalledWith(page, updatedPage, categories);
     });
 
     it('returns updated page', async () => {

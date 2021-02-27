@@ -57,11 +57,13 @@ export class PagesController {
       throw PageException.slugAlreadyExist();
     }
 
-    const slug = pageDTO.slug ?? (await this.pagesService.generateSlug(pageDTO.name));
+    const { categories, ...dto } = pageDTO;
 
-    const page = { ...pageDTO, slug, userId: user.id };
+    const slug = dto.slug ?? (await this.pagesService.generateSlug(dto.name));
 
-    return await this.pagesService.create(page);
+    const page = { ...dto, slug, userId: user.id };
+
+    return await this.pagesService.create(page, categories);
   }
 
   @Put('/:id')
@@ -82,13 +84,15 @@ export class PagesController {
       throw PageException.pageNotExist();
     }
 
-    const pageBySlug = pageDTO.slug ? await this.pagesService.getOne({ slug: pageDTO.slug }) : null;
+    const { categories, ...dto } = pageDTO;
+
+    const pageBySlug = pageDTO.slug ? await this.pagesService.getOne({ slug: dto.slug }) : null;
 
     if (pageBySlug && pageBySlug.slug !== page.slug) {
       throw PageException.slugAlreadyExist();
     }
 
-    return await this.pagesService.update(page, pageDTO);
+    return await this.pagesService.update(page, dto, categories);
   }
 
   @Delete('/:id')

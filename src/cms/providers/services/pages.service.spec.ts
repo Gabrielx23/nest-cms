@@ -6,6 +6,7 @@ import { Slugger } from '../../../app/utils/slugger';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
 import { Paginator } from '../../../app/utils/paginator';
+import { PageCategoryDAO } from '../../database/dao/page-category.dao';
 
 const pageDAOMock = () => ({
   findOne: jest.fn(),
@@ -14,6 +15,11 @@ const pageDAOMock = () => ({
   update: jest.fn(),
   destroy: jest.fn(),
   countAll: jest.fn(),
+});
+
+const pageCategoryDAOMock = () => ({
+  create: jest.fn(),
+  destroy: jest.fn(),
 });
 
 const sluggerMock = () => ({
@@ -33,7 +39,11 @@ const page: PageInterface = {
 };
 
 describe('PagesService', () => {
-  let service: PagesService, dao: PageDAO, slugger: Slugger, configService: ConfigService;
+  let service: PagesService,
+    dao: PageDAO,
+    slugger: Slugger,
+    configService: ConfigService,
+    pageCategoryDAO: PageCategoryDAO;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -41,13 +51,15 @@ describe('PagesService', () => {
         { provide: PageDAO, useFactory: pageDAOMock },
         { provide: Slugger, useFactory: sluggerMock },
         { provide: ConfigService, useFactory: configServiceMock },
+        { provide: PageCategoryDAO, useFactory: pageCategoryDAOMock },
       ],
     }).compile();
 
     dao = await module.resolve(PageDAO);
     slugger = await module.resolve(Slugger);
     configService = await module.resolve(ConfigService);
-    service = new PagesService(dao, slugger, configService);
+    pageCategoryDAO = await module.resolve(PageCategoryDAO);
+    service = new PagesService(dao, slugger, configService, pageCategoryDAO);
   });
 
   describe('destroy', () => {
@@ -62,6 +74,8 @@ describe('PagesService', () => {
     const toUpdate = { name: 'different name', slug: 'also different slug' };
 
     it('uses dao to update given page', async () => {
+      jest.spyOn(dao, 'update').mockResolvedValue(page);
+
       await service.update(page, toUpdate);
 
       expect(dao.update).toHaveBeenCalledWith(page, toUpdate);
@@ -69,6 +83,7 @@ describe('PagesService', () => {
 
     it('returns updated page', async () => {
       jest.spyOn(dao, 'update').mockResolvedValue(page);
+      jest.spyOn(dao, 'findOne').mockResolvedValue(page);
 
       const result = await service.update(page, toUpdate);
 
@@ -78,13 +93,34 @@ describe('PagesService', () => {
 
   describe('create', () => {
     it('uses dao to create page', async () => {
+      jest.spyOn(dao, 'create').mockResolvedValue(page);
+
       await service.create(page);
 
       expect(dao.create).toHaveBeenCalledWith(page);
     });
 
+    it('uses dao to link page with category if categories array is provided', async () => {
+      const categories = ['first', 'second'];
+
+      jest.spyOn(dao, 'create').mockResolvedValue(page);
+
+      await service.create(page, categories);
+
+      expect(pageCategoryDAO.create).toHaveBeenCalledTimes(2);
+      expect(pageCategoryDAO.create).toHaveBeenNthCalledWith(1, {
+        pageId: page.id,
+        categoryId: 'first',
+      });
+      expect(pageCategoryDAO.create).toHaveBeenNthCalledWith(2, {
+        pageId: page.id,
+        categoryId: 'second',
+      });
+    });
+
     it('returns created page', async () => {
       jest.spyOn(dao, 'create').mockResolvedValue(page);
+      jest.spyOn(dao, 'findOne').mockResolvedValue(page);
 
       const result = await service.create(page);
 
