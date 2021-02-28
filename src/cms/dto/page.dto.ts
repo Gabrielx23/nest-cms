@@ -47,7 +47,7 @@ export class PageDTO {
 
   @IsOptional()
   @IsUrl()
-  @MaxLength(65535)
+  @MaxLength(parseInt(process.env.MAX_DB_URL_LENGTH))
   @ApiProperty({ example: 'https://photo.com/photo/photo.jpg' })
   thumbnail: string;
 
