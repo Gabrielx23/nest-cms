@@ -8,6 +8,7 @@ import { UserModule } from '../user/user.module';
 import { FileModule } from '../file/file.module';
 import { I18nJsonParser, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
+import { SettingModule } from '../settings/setting.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { join } from 'path';
     UserModule,
     CMSModule,
     FileModule,
+    SettingModule,
     I18nModule.forRoot({
       fallbackLanguage: 'pl',
       parser: I18nJsonParser,

@@ -1,7 +1,7 @@
 import { I18nService, translateOptions } from 'nestjs-i18n';
 import { Injectable } from '@nestjs/common';
-import { SettingsService } from '../../../dist/settings/providers/services/settings.service';
-import { SettingsNamesEnum } from '../../../dist/settings/enum/settings-names.enum';
+import { SettingsService } from '../../settings/providers/services/settings.service';
+import { SettingNamesEnum } from '../../settings/enum/setting-names.enum';
 
 @Injectable()
 export class Translator {
@@ -16,7 +16,7 @@ export class Translator {
     }
 
     if (!translateOptions.lang) {
-      const langSetting = await this.settingsService.getOne({ name: SettingsNamesEnum.language });
+      const langSetting = await this.settingsService.getOne({ name: SettingNamesEnum.language });
       translateOptions.lang = langSetting.value;
     }
 
