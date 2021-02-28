@@ -61,9 +61,9 @@ export class PagesController {
 
     const slug = dto.slug ?? (await this.pagesService.generateSlug(dto.name));
 
-    const page = { ...dto, slug, userId: user.id };
+    const partial = { ...dto, slug, userId: user.id };
 
-    return await this.pagesService.create(page, categories);
+    return await this.pagesService.create(partial, categories);
   }
 
   @Put('/:id')

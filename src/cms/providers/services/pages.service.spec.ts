@@ -108,10 +108,12 @@ describe('PagesService', () => {
       await service.create(page, categories);
 
       expect(pageCategoryDAO.create).toHaveBeenCalledTimes(2);
+
       expect(pageCategoryDAO.create).toHaveBeenNthCalledWith(1, {
         pageId: page.id,
         categoryId: 'first',
       });
+
       expect(pageCategoryDAO.create).toHaveBeenNthCalledWith(2, {
         pageId: page.id,
         categoryId: 'second',

@@ -50,11 +50,14 @@ export class PagesService {
     throw PageException.tooManyGenerateSlugAttempts();
   }
 
-  public async create(partial: Partial<Page>, categories?: Array<string>): Promise<PageInterface> {
+  public async create(
+    partial: Partial<Page>,
+    categoriesIds?: Array<string>,
+  ): Promise<PageInterface> {
     const created = await this.pageDAO.create(partial);
 
-    if (categories) {
-      for (const categoryId of categories) {
+    if (categoriesIds) {
+      for (const categoryId of categoriesIds) {
         await this.pageCategoryDAO.create({ pageId: created.id, categoryId });
       }
     }
@@ -65,16 +68,18 @@ export class PagesService {
   public async update(
     page: PageInterface,
     partial: Partial<Page>,
-    categories?: Array<string>,
+    categoriesIds?: Array<string>,
   ): Promise<PageInterface> {
     const updated = await this.pageDAO.update(page as Page, partial);
 
-    if (categories) {
-      await this.pageCategoryDAO.destroy(page.id);
+    if (!categoriesIds) {
+      return await this.pageDAO.findOne({ id: updated.id });
+    }
 
-      for (const categoryId of categories) {
-        await this.pageCategoryDAO.create({ pageId: updated.id, categoryId });
-      }
+    await this.pageCategoryDAO.destroy(page.id);
+
+    for (const categoryId of categoriesIds) {
+      await this.pageCategoryDAO.create({ pageId: updated.id, categoryId });
     }
 
     return await this.pageDAO.findOne({ id: updated.id });
