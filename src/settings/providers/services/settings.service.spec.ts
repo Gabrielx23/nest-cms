@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { SettingInterface } from '../../database/models/setting.interface';
 import { SettingsService } from './settings.service';
 import { SettingDAO } from '../../database/dao/setting.dao';
-import { SettingsNamesEnum } from '../../enum/settings-names.enum';
+import { SettingNamesEnum } from '../../enum/setting-names.enum';
 import { LanguageEnum } from '../../enum/language.enum';
 
 const settingDAOMock = () => ({
@@ -30,7 +30,7 @@ describe('SettingsService', () => {
   });
 
   describe('update', () => {
-    const toUpdate = { name: SettingsNamesEnum.language, value: LanguageEnum.pl };
+    const toUpdate = { name: SettingNamesEnum.language, value: LanguageEnum.pl };
 
     it('uses dao to update given setting', async () => {
       await service.update(setting, toUpdate);

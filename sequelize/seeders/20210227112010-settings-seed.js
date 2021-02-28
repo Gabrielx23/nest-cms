@@ -45,6 +45,20 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        id: '9f60a113-91ef-4758-9a3f-18add531f88b',
+        name: 'metaTitle',
+        value: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 'c635656e-ff1b-4bd7-ba3a-5e20bae6a302',
+        name: 'metaDescription',
+        value: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
   down: (queryInterface, Sequelize) => {

@@ -2,16 +2,16 @@ import { IsOptional, MaxLength, IsEnum, IsUrl, MinLength } from 'class-validator
 import { ApiProperty } from '@nestjs/swagger';
 import { LanguageEnum } from '../enum/language.enum';
 
-export class SettingDTO {
+export class SettingsDTO {
   @IsOptional()
   @IsUrl()
-  @MaxLength(65535)
+  @MaxLength(parseInt(process.env.MAX_DB_URL_LENGTH))
   @ApiProperty({ example: 'https://photo.com/photo/photo.jpg' })
   logo: string;
 
   @IsOptional()
   @IsUrl()
-  @MaxLength(65535)
+  @MaxLength(parseInt(process.env.MAX_DB_URL_LENGTH))
   @ApiProperty({ example: 'https://photo.com/photo/photo.jpg' })
   favicon: string;
 
@@ -37,4 +37,14 @@ export class SettingDTO {
   @MaxLength(255)
   @ApiProperty({ example: 'application nest' })
   keyWords: string;
+
+  @IsOptional()
+  @MaxLength(255)
+  @ApiProperty({ example: 'Meta title' })
+  metaTitle: string;
+
+  @IsOptional()
+  @MaxLength(255)
+  @ApiProperty({ example: 'Meta description' })
+  metaDescription: string;
 }

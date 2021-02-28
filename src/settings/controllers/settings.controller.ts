@@ -20,7 +20,7 @@ import {
 import { AuthGuard } from '../../user/providers/auth.guard';
 import { SettingsService } from '../providers/services/settings.service';
 import { Setting } from '../database/models/setting.model';
-import { SettingDTO } from '../dto/setting.dto';
+import { SettingsDTO } from '../dto/settings.dto';
 import { SettingInterface } from '../database/models/setting.interface';
 import { SettingException } from '../exceptions/setting.exception';
 
@@ -34,24 +34,24 @@ import { SettingException } from '../exceptions/setting.exception';
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
-  @Post('/')
+  @Post()
   @UsePipes(ValidationPipe)
   @ApiOkResponse({ type: [Setting] })
-  public async update(@Body() settingDTO: SettingDTO): Promise<Array<SettingInterface>> {
-    for (const toUpdate of Object.keys(settingDTO)) {
+  public async update(@Body() settingsDTO: SettingsDTO): Promise<Array<SettingInterface>> {
+    for (const toUpdate of Object.keys(settingsDTO)) {
       const setting = await this.settingsService.getOne({ name: toUpdate });
 
       if (!setting) {
         continue;
       }
 
-      await this.settingsService.update(setting, { name: toUpdate, value: settingDTO[toUpdate] });
+      await this.settingsService.update(setting, { name: toUpdate, value: settingsDTO[toUpdate] });
     }
 
     return await this.settingsService.getAll();
   }
 
-  @Get('/')
+  @Get()
   @ApiOkResponse({ type: [Setting] })
   public async getAll(): Promise<Array<SettingInterface>> {
     return await this.settingsService.getAll();

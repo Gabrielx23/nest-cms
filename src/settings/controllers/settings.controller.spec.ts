@@ -2,9 +2,9 @@ import { Test } from '@nestjs/testing';
 import { SettingInterface } from '../database/models/setting.interface';
 import { SettingsService } from '../providers/services/settings.service';
 import { SettingsController } from './settings.controller';
-import { SettingDTO } from '../dto/setting.dto';
+import { SettingsDTO } from '../dto/settings.dto';
 import { LanguageEnum } from '../enum/language.enum';
-import { SettingsNamesEnum } from '../enum/settings-names.enum';
+import { SettingNamesEnum } from '../enum/setting-names.enum';
 import { NotFoundException } from '@nestjs/common';
 
 const settingsServiceMock = () => ({
@@ -32,10 +32,10 @@ describe('SettingsController', () => {
   });
 
   describe('update', () => {
-    const dto = new SettingDTO();
+    const dto = new SettingsDTO();
 
     it('uses settings service to update settings', async () => {
-      const settingName = SettingsNamesEnum.language;
+      const settingName = SettingNamesEnum.language;
       dto[settingName] = LanguageEnum.fr;
       jest.spyOn(settingsService, 'getOne').mockResolvedValue(setting);
 
