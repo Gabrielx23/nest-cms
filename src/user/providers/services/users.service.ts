@@ -3,10 +3,21 @@ import { UserDAO } from '../../database/dao/user.dao';
 import { User } from '../../database/models/user.model';
 import { UserException } from '../../exceptions/user.exception';
 import { UserInterface } from '../../database/models/user.interface';
+import * as Cryptr from 'cryptr';
+import { ConfigService } from '@nestjs/config';
+import { EnvKeyEnum } from '../../../app/enum/env-key.enum';
+import { ResetPasswordRequestMail } from '../../mails/reset-password-request.mail';
+import { ResetPasswordMail } from '../../mails/reset-password.mail';
+import has = Reflect.has;
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userDAO: UserDAO) {}
+  constructor(
+    private readonly userDAO: UserDAO,
+    private readonly configService: ConfigService,
+    private readonly resetPasswordRequestMail: ResetPasswordRequestMail,
+    private readonly resetPasswordMail: ResetPasswordMail,
+  ) {}
 
   public async getAll(raw = false): Promise<Array<UserInterface>> {
     return await this.userDAO.findAll(raw);
@@ -48,5 +59,41 @@ export class UsersService {
     await this.userDAO.destroy(user as User);
 
     return user;
+  }
+
+  public async resetPasswordRequest(user: UserInterface): Promise<void> {
+    const frontURL = this.configService.get(EnvKeyEnum.FrontURLResetPassword);
+
+    const cryptr = new Cryptr(this.configService.get(EnvKeyEnum.CryptSecret));
+
+    const encrypted = cryptr.encrypt(`${user.email}"${new Date()}`);
+
+    const url = `${frontURL}?${encrypted};`;
+
+    await this.resetPasswordRequestMail.send(user, url, 'pl');
+  }
+
+  public async resetPassword(
+    token: string,
+    password: string,
+    hashedPassword: string,
+  ): Promise<void> {
+    const cryptr = new Cryptr(this.configService.get(EnvKeyEnum.CryptSecret));
+
+    const encrypted = cryptr.decrypt(token);
+
+    console.log(encrypted);
+
+    const tokenData = encrypted.split('"');
+
+    const user = await this.userDAO.findOne({ email: tokenData[0] });
+
+    if (!user) {
+      throw UserException.userNotExist();
+    }
+
+    await this.userDAO.update(user as User, { password: hashedPassword });
+
+    await this.resetPasswordMail.send(user, password, 'en');
   }
 }

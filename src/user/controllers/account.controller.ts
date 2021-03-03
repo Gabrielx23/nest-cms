@@ -12,6 +12,7 @@ import {
   Get,
   Patch,
   Put,
+  Post,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -26,18 +27,23 @@ import { User } from '../database/models/user.model';
 import { UpdateAccountDTO } from '../dto/update-account.dto';
 import { ChangePasswordDTO } from '../dto/change-password.dto';
 import { UserException } from '../exceptions/user.exception';
+import { PasswordResetRequestDTO } from '../dto/password-reset-request.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { PasswordResetDTO } from '../dto/password-reset.dto';
+import * as crypto from 'crypto';
 
 @ApiTags('Account')
-@UseGuards(AuthGuard)
 @Controller('account')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AccountController {
   constructor(
     private readonly usersService: UsersService,
     private readonly passwordService: PasswordsService,
+    private readonly mailerService: MailerService,
   ) {}
 
   @Get()
+  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
   @ApiBadRequestResponse()
@@ -47,6 +53,7 @@ export class AccountController {
   }
 
   @Put()
+  @UseGuards(AuthGuard)
   @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
@@ -62,6 +69,7 @@ export class AccountController {
   }
 
   @Patch('password')
+  @UseGuards(AuthGuard)
   @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
@@ -80,5 +88,28 @@ export class AccountController {
     await this.usersService.update(user, { password });
 
     return await this.usersService.getOne({ id: user.id }, true);
+  }
+
+  @Post('password/reset/request')
+  @UsePipes(ValidationPipe)
+  public async resetPasswordRequest(@Body() dto: PasswordResetRequestDTO): Promise<void> {
+    const user = await this.usersService.getOne({ email: dto.email });
+
+    if (!user) {
+      throw UserException.userNotExist();
+    }
+
+    await this.usersService.resetPasswordRequest(user);
+  }
+
+  @Post('password/reset')
+  public async resetPassword(@Body() dto: PasswordResetDTO): Promise<void> {
+    const password = crypto.randomBytes(8).toString('base64');
+
+    const hashedPassword = await this.passwordService.hash(password);
+
+    console.log(hashedPassword);
+
+    await this.usersService.resetPassword(dto.token, password, hashedPassword);
   }
 }
