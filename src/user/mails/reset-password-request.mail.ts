@@ -20,12 +20,12 @@ export class ResetPasswordRequestMail {
     await this.mailerService.sendMail({
       to: to.email,
       from: await this.configService.get(EnvKeyEnum.EmailFrom),
-      subject: await this.i18n.translate('emails.test', translateOptions),
+      subject: await this.i18n.translate('emails.reset-password-request-subject', translateOptions),
       template: ResetPasswordRequestMail.templateName,
       context: {
         resetURL: resetURL,
-        header: await this.i18n.translate('emails.test', translateOptions),
-        footer: await this.i18n.translate('emails.test', translateOptions),
+        header: await this.i18n.translate('emails.reset-password-request-header', translateOptions),
+        footer: await this.i18n.translate('emails.reset-password-request-footer', translateOptions),
       },
     });
   }

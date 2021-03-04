@@ -1,3 +1,8 @@
 {
-  "test": "polski"
+  "reset-password-request-subject": "Prośba o zresetowanie hasła",
+  "reset-password-request-header": "Prośba o zresetowanie hasła w naszej aplikacji została wysłana z Twojego adresu email. Jeśli chcesz zresetować hasło kliknij w poniższy link.",
+  "reset-password-request-footer": " Jeśli nie Ty wysłałeś prośbę o reset hasła zignoruj tę wiadomość. Pozdrawiamy.",
+  "reset-password-subject": "Wygenerowano nowe hasło",
+  "reset-password-header": "Zostało wygenerowane nowe hasło do Twojego konta",
+  "reset-password-footer": "Pozdrawiamy."
 }

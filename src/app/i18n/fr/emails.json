@@ -1,3 +1,8 @@
 {
-  "test": "français"
+  "reset-password-request-subject": "français Password reset request",
+  "reset-password-request-header": "français Password reset request has been sent on this email adress. If you want to reset password click the button below.",
+  "reset-password-request-footer": "français If you had not sent this email simply ignore this mail. Best regards.",
+  "reset-password-subject": "français New password for your account",
+  "reset-password-header": "français A new password for your account was generated.",
+  "reset-password-footer": "français Best regards."
 }

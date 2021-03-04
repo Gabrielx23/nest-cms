@@ -32,6 +32,8 @@ import { UserException } from '../exceptions/user.exception';
 import { UpdateUserDTO } from '../dto/update-user.dto';
 import { CreateUserDTO } from '../dto/create-user.dto';
 import { PasswordsService } from '../providers/services/passwords.service';
+import * as crypto from 'crypto';
+import { AdminPasswordResetDTO } from '../dto/admin-password-reset.dto';
 
 @ApiTags('User')
 @Controller('users')
@@ -127,5 +129,26 @@ export class UsersController {
     await this.usersService.create({ ...dto, password });
 
     return await this.usersService.getOne({ email: dto.email }, true);
+  }
+
+  @Post('password/reset')
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
+  @Roles(RoleEnum.administrator)
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  public async resetPassword(@Body() dto: AdminPasswordResetDTO): Promise<void> {
+    const user = await this.usersService.getOne({ email: dto.email });
+
+    if (!user) {
+      throw UserException.userNotExist();
+    }
+
+    const password = crypto.randomBytes(8).toString('base64');
+
+    const hashedPassword = await this.passwordService.hash(password);
+
+    await this.usersService.adminResetPassword(user, password, hashedPassword);
   }
 }

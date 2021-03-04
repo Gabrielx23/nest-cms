@@ -1,3 +1,8 @@
 {
-  "test": "english"
+  "reset-password-request-subject": "Password reset request",
+  "reset-password-request-header": "Password reset request has been sent on this email adress. If you want to reset password click the button below.",
+  "reset-password-request-footer": "If you had not sent this email simply ignore this mail. Best regards.",
+  "reset-password-subject": "New password for your account",
+  "reset-password-header": "A new password for your account was generated.",
+  "reset-password-footer": "Best regards."
 }

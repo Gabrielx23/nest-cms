@@ -8,7 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { EnvKeyEnum } from '../../../app/enum/env-key.enum';
 import { ResetPasswordRequestMail } from '../../mails/reset-password-request.mail';
 import { ResetPasswordMail } from '../../mails/reset-password.mail';
-import has = Reflect.has;
+import { SettingsGateway } from '../../../settings/providers/gateways/settings.gateway';
+import { SettingNamesEnum } from '../../../settings/enum/setting-names.enum';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,7 @@ export class UsersService {
     private readonly configService: ConfigService,
     private readonly resetPasswordRequestMail: ResetPasswordRequestMail,
     private readonly resetPasswordMail: ResetPasswordMail,
+    private readonly settingsGateway: SettingsGateway,
   ) {}
 
   public async getAll(raw = false): Promise<Array<UserInterface>> {
@@ -70,7 +72,21 @@ export class UsersService {
 
     const url = `${frontURL}?${encrypted};`;
 
-    await this.resetPasswordRequestMail.send(user, url, 'pl');
+    const language = await this.settingsGateway.getSettingByName(SettingNamesEnum.language);
+
+    await this.resetPasswordRequestMail.send(user, url, language.value);
+  }
+
+  public async adminResetPassword(
+    user: UserInterface,
+    password: string,
+    hashedPassword: string,
+  ): Promise<void> {
+    await this.userDAO.update(user as User, { password: hashedPassword });
+
+    const language = await this.settingsGateway.getSettingByName(SettingNamesEnum.language);
+
+    await this.resetPasswordMail.send(user, password, language.value);
   }
 
   public async resetPassword(
@@ -82,8 +98,6 @@ export class UsersService {
 
     const encrypted = cryptr.decrypt(token);
 
-    console.log(encrypted);
-
     const tokenData = encrypted.split('"');
 
     const user = await this.userDAO.findOne({ email: tokenData[0] });
@@ -94,6 +108,8 @@ export class UsersService {
 
     await this.userDAO.update(user as User, { password: hashedPassword });
 
-    await this.resetPasswordMail.send(user, password, 'en');
+    const language = await this.settingsGateway.getSettingByName(SettingNamesEnum.language);
+
+    await this.resetPasswordMail.send(user, password, language.value);
   }
 }

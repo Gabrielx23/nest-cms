@@ -103,12 +103,11 @@ export class AccountController {
   }
 
   @Post('password/reset')
+  @UsePipes(ValidationPipe)
   public async resetPassword(@Body() dto: PasswordResetDTO): Promise<void> {
     const password = crypto.randomBytes(8).toString('base64');
 
     const hashedPassword = await this.passwordService.hash(password);
-
-    console.log(hashedPassword);
 
     await this.usersService.resetPassword(dto.token, password, hashedPassword);
   }
