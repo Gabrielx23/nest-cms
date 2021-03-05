@@ -59,6 +59,13 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        id: '3a7ee17d-93f4-44ae-adae-cc5ef2334992',
+        name: 'email',
+        value: 'biuro@firma.pl',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
   down: (queryInterface, Sequelize) => {

@@ -3,6 +3,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -33,7 +34,6 @@ import { UpdateUserDTO } from '../dto/update-user.dto';
 import { CreateUserDTO } from '../dto/create-user.dto';
 import { PasswordsService } from '../providers/services/passwords.service';
 import * as crypto from 'crypto';
-import { AdminPasswordResetDTO } from '../dto/admin-password-reset.dto';
 
 @ApiTags('User')
 @Controller('users')
@@ -131,15 +131,16 @@ export class UsersController {
     return await this.usersService.getOne({ email: dto.email }, true);
   }
 
-  @Post('password/reset')
+  @Put('password/reset/:id')
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @Roles(RoleEnum.administrator)
   @ApiBadRequestResponse()
+  @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
-  public async resetPassword(@Body() dto: AdminPasswordResetDTO): Promise<void> {
-    const user = await this.usersService.getOne({ email: dto.email });
+  public async resetPassword(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
+    const user = await this.usersService.getOne({ id });
 
     if (!user) {
       throw UserException.userNotExist();
@@ -149,6 +150,6 @@ export class UsersController {
 
     const hashedPassword = await this.passwordService.hash(password);
 
-    await this.usersService.adminResetPassword(user, password, hashedPassword);
+    await this.usersService.resetPassword(user, password, hashedPassword);
   }
 }

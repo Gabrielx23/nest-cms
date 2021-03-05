@@ -1,6 +1,7 @@
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -31,6 +32,9 @@ import { PasswordResetRequestDTO } from '../dto/password-reset-request.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { PasswordResetDTO } from '../dto/password-reset.dto';
 import * as crypto from 'crypto';
+import { ConfigService } from '@nestjs/config';
+import { EnvKeyEnum } from '../../app/enum/env-key.enum';
+import { Crypter } from '../../app/utils/crypter';
 
 @ApiTags('Account')
 @Controller('account')
@@ -40,6 +44,7 @@ export class AccountController {
     private readonly usersService: UsersService,
     private readonly passwordService: PasswordsService,
     private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Get()
@@ -92,6 +97,8 @@ export class AccountController {
 
   @Post('password/reset/request')
   @UsePipes(ValidationPipe)
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
   public async resetPasswordRequest(@Body() dto: PasswordResetRequestDTO): Promise<void> {
     const user = await this.usersService.getOne({ email: dto.email });
 
@@ -99,16 +106,38 @@ export class AccountController {
       throw UserException.userNotExist();
     }
 
-    await this.usersService.resetPasswordRequest(user);
+    const frontURL = this.configService.get(EnvKeyEnum.FrontURLResetPassword);
+
+    const secret = await this.configService.get(EnvKeyEnum.CryptSecret);
+
+    const encrypted = Crypter.encrypt(`${user.email}"${new Date()}`, secret);
+
+    const url = `${frontURL}?${encrypted};`;
+
+    await this.usersService.resetPasswordRequest(user, url);
   }
 
   @Post('password/reset')
   @UsePipes(ValidationPipe)
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
   public async resetPassword(@Body() dto: PasswordResetDTO): Promise<void> {
     const password = crypto.randomBytes(8).toString('base64');
 
     const hashedPassword = await this.passwordService.hash(password);
 
-    await this.usersService.resetPassword(dto.token, password, hashedPassword);
+    const secret = await this.configService.get(EnvKeyEnum.CryptSecret);
+
+    const decrypted = Crypter.decrypt(dto.token, secret);
+
+    const tokenData = decrypted.split('"');
+
+    const user = await this.usersService.getOne({ email: tokenData[0] });
+
+    if (!user) {
+      throw UserException.userNotExist();
+    }
+
+    await this.usersService.resetPassword(user, password, hashedPassword);
   }
 }

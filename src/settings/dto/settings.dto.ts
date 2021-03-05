@@ -1,4 +1,4 @@
-import { IsOptional, MaxLength, IsEnum, IsUrl, MinLength } from 'class-validator';
+import { IsOptional, MaxLength, IsEnum, IsUrl, MinLength, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { LanguageEnum } from '../enum/language.enum';
 
@@ -47,4 +47,9 @@ export class SettingsDTO {
   @MaxLength(255)
   @ApiProperty({ example: 'Meta description' })
   metaDescription: string;
+
+  @IsOptional()
+  @IsEmail()
+  @ApiProperty({ example: 'john.doe@hotmail.com' })
+  email: string;
 }

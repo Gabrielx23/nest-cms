@@ -3,13 +3,10 @@ import { UserDAO } from '../../database/dao/user.dao';
 import { User } from '../../database/models/user.model';
 import { UserException } from '../../exceptions/user.exception';
 import { UserInterface } from '../../database/models/user.interface';
-import * as Cryptr from 'cryptr';
 import { ConfigService } from '@nestjs/config';
-import { EnvKeyEnum } from '../../../app/enum/env-key.enum';
 import { ResetPasswordRequestMail } from '../../mails/reset-password-request.mail';
 import { ResetPasswordMail } from '../../mails/reset-password.mail';
 import { SettingsGateway } from '../../../settings/providers/gateways/settings.gateway';
-import { SettingNamesEnum } from '../../../settings/enum/setting-names.enum';
 
 @Injectable()
 export class UsersService {
@@ -63,53 +60,17 @@ export class UsersService {
     return user;
   }
 
-  public async resetPasswordRequest(user: UserInterface): Promise<void> {
-    const frontURL = this.configService.get(EnvKeyEnum.FrontURLResetPassword);
-
-    const cryptr = new Cryptr(this.configService.get(EnvKeyEnum.CryptSecret));
-
-    const encrypted = cryptr.encrypt(`${user.email}"${new Date()}`);
-
-    const url = `${frontURL}?${encrypted};`;
-
-    const language = await this.settingsGateway.getSettingByName(SettingNamesEnum.language);
-
-    await this.resetPasswordRequestMail.send(user, url, language.value);
+  public async resetPasswordRequest(user: UserInterface, url: string): Promise<void> {
+    await this.resetPasswordRequestMail.send(user, url);
   }
 
-  public async adminResetPassword(
+  public async resetPassword(
     user: UserInterface,
     password: string,
     hashedPassword: string,
   ): Promise<void> {
     await this.userDAO.update(user as User, { password: hashedPassword });
 
-    const language = await this.settingsGateway.getSettingByName(SettingNamesEnum.language);
-
-    await this.resetPasswordMail.send(user, password, language.value);
-  }
-
-  public async resetPassword(
-    token: string,
-    password: string,
-    hashedPassword: string,
-  ): Promise<void> {
-    const cryptr = new Cryptr(this.configService.get(EnvKeyEnum.CryptSecret));
-
-    const encrypted = cryptr.decrypt(token);
-
-    const tokenData = encrypted.split('"');
-
-    const user = await this.userDAO.findOne({ email: tokenData[0] });
-
-    if (!user) {
-      throw UserException.userNotExist();
-    }
-
-    await this.userDAO.update(user as User, { password: hashedPassword });
-
-    const language = await this.settingsGateway.getSettingByName(SettingNamesEnum.language);
-
-    await this.resetPasswordMail.send(user, password, language.value);
+    await this.resetPasswordMail.send(user, password);
   }
 }
