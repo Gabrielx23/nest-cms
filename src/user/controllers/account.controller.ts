@@ -29,7 +29,6 @@ import { UpdateAccountDTO } from '../dto/update-account.dto';
 import { ChangePasswordDTO } from '../dto/change-password.dto';
 import { UserException } from '../exceptions/user.exception';
 import { PasswordResetRequestDTO } from '../dto/password-reset-request.dto';
-import { MailerService } from '@nestjs-modules/mailer';
 import { PasswordResetDTO } from '../dto/password-reset.dto';
 import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
@@ -43,7 +42,6 @@ export class AccountController {
   constructor(
     private readonly usersService: UsersService,
     private readonly passwordService: PasswordsService,
-    private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -132,7 +130,7 @@ export class AccountController {
 
     const tokenData = decrypted.split('"');
 
-    const user = await this.usersService.getOne({ email: tokenData[0] });
+    const user = await this.usersService.getOne({ email: tokenData[0] ?? '' });
 
     if (!user) {
       throw UserException.userNotExist();

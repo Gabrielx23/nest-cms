@@ -6,7 +6,6 @@ import { UserInterface } from '../../database/models/user.interface';
 import { ConfigService } from '@nestjs/config';
 import { ResetPasswordRequestMail } from '../../mails/reset-password-request.mail';
 import { ResetPasswordMail } from '../../mails/reset-password.mail';
-import { SettingsGateway } from '../../../settings/providers/gateways/settings.gateway';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +14,6 @@ export class UsersService {
     private readonly configService: ConfigService,
     private readonly resetPasswordRequestMail: ResetPasswordRequestMail,
     private readonly resetPasswordMail: ResetPasswordMail,
-    private readonly settingsGateway: SettingsGateway,
   ) {}
 
   public async getAll(raw = false): Promise<Array<UserInterface>> {
