@@ -32,6 +32,10 @@ export class PageDAO {
           association: 'user',
           attributes: { exclude: ['password', 'token'] },
         },
+        {
+          association: 'categories',
+          through: { attributes: [] },
+        },
       ],
       where: conditions || {},
     });
@@ -48,6 +52,10 @@ export class PageDAO {
         {
           association: 'user',
           attributes: { exclude: ['password', 'token'] },
+        },
+        {
+          association: 'categories',
+          through: { attributes: [] },
         },
       ],
     });

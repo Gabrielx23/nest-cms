@@ -8,6 +8,7 @@ import {
   Matches,
   IsUrl,
   IsEnum,
+  IsArray,
 } from 'class-validator';
 import { PageTemplateTypeEnum } from '../enum/page-template-type.enum';
 import { ApiProperty } from '@nestjs/swagger';
@@ -59,4 +60,11 @@ export class PageDTO {
   @MaxLength(255)
   @ApiProperty({ example: 'Meta description' })
   metaDescription: string;
+
+  @IsOptional()
+  @IsArray()
+  @ApiProperty({
+    example: ['91e56daf-04ef-4bbc-abe7-5d3a8ee41101', '91e56daf-04ef-4bbc-abe7-5d3a8ee41541'],
+  })
+  categories: Array<string>;
 }
