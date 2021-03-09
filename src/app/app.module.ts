@@ -9,6 +9,8 @@ import { FileModule } from '../file/file.module';
 import { I18nJsonParser, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
 import { SettingModule } from '../settings/setting.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { LanguageEnum } from '../settings/enum/language.enum';
 
 @Module({
@@ -25,6 +27,27 @@ import { LanguageEnum } from '../settings/enum/language.enum';
       parserOptions: {
         path: join(__dirname, '/i18n/'),
         watch: true,
+      },
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: LanguageEnum.en,
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
+    MailerModule.forRoot({
+      transport: process.env.EMAIL_TRANSPORT,
+      defaults: {
+        from: process.env.EMAIL_FROM,
+      },
+      template: {
+        dir: __dirname + '/mailTemplates',
+        adapter: new EjsAdapter(),
+        options: {
+          strict: true,
+        },
       },
     }),
   ],

@@ -3,10 +3,18 @@ import { UserDAO } from '../../database/dao/user.dao';
 import { User } from '../../database/models/user.model';
 import { UserException } from '../../exceptions/user.exception';
 import { UserInterface } from '../../database/models/user.interface';
+import { ConfigService } from '@nestjs/config';
+import { ResetPasswordRequestMail } from '../../mails/reset-password-request.mail';
+import { ResetPasswordMail } from '../../mails/reset-password.mail';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userDAO: UserDAO) {}
+  constructor(
+    private readonly userDAO: UserDAO,
+    private readonly configService: ConfigService,
+    private readonly resetPasswordRequestMail: ResetPasswordRequestMail,
+    private readonly resetPasswordMail: ResetPasswordMail,
+  ) {}
 
   public async getAll(raw = false): Promise<Array<UserInterface>> {
     return await this.userDAO.findAll(raw);
@@ -48,5 +56,19 @@ export class UsersService {
     await this.userDAO.destroy(user as User);
 
     return user;
+  }
+
+  public async resetPasswordRequest(user: UserInterface, url: string): Promise<void> {
+    await this.resetPasswordRequestMail.send(user, url);
+  }
+
+  public async resetPassword(
+    user: UserInterface,
+    password: string,
+    hashedPassword: string,
+  ): Promise<void> {
+    await this.userDAO.update(user as User, { password: hashedPassword });
+
+    await this.resetPasswordMail.send(user, password);
   }
 }

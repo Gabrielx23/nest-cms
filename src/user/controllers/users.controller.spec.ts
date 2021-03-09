@@ -14,6 +14,7 @@ const usersServiceMock = () => ({
   create: jest.fn(),
   update: jest.fn(),
   destroy: jest.fn(),
+  resetPassword: jest.fn(),
 });
 
 const passwordServiceMock = () => ({
@@ -142,6 +143,21 @@ describe('UsersController', () => {
 
       expect(result).toEqual([user]);
       expect(usersService.getAll).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('throws exception if user not exist', async () => {
+      await expect(controller.resetPassword(user.id)).rejects.toThrow(NotFoundException);
+    });
+
+    it('uses users service to reset user password', async () => {
+      jest.spyOn(usersService, 'getOne').mockResolvedValue(user);
+      jest.spyOn(passwordsService, 'hash').mockResolvedValue('hashedPassword');
+
+      await controller.resetPassword(user.id);
+
+      expect(usersService.resetPassword).toHaveBeenCalled();
     });
   });
 });

@@ -7,4 +7,5 @@ export enum SettingNamesEnum {
   keyWords = 'keyWords',
   metaTitle = 'metaTitle',
   metaDescription = 'metaDescription',
+  email = 'email',
 }

@@ -11,4 +11,8 @@ export enum EnvKeyEnum {
   SwaggerUri = 'SWAGGER_URI',
   MaxSlugGenerateAttempts = 'MAX_SLUG_GENERATE_ATTEMPTS',
   MaxUrlLength = 'MAX_URL_LENGTH',
+  CryptSecret = 'CRYPT_SECRET',
+  EmailTransport = 'EMAIL_TRANSPORT',
+  FrontURL = 'FRONT_URL',
+  FrontURLResetPassword = 'FRONT_URL_RESET_PASSWORD',
 }
